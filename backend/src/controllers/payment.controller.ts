@@ -6,7 +6,7 @@ import { razorpayInstance, verifyRazorpaySignature } from '../utils/razorpay';
 export const createOrder = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { webinarId, idempotencyKey } = req.body;
-        const userId = req.user!.userId;
+        const userId = String(req.user!.userId);
 
         // Check if user is already registered
         const existingRegistration = await prisma.registration.findFirst({
@@ -71,7 +71,7 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
 export const verifyPayment = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { webinarId, razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-        const userId = req.user!.userId;
+        const userId = String(req.user!.userId);
 
         const isValid = verifyRazorpaySignature(razorpay_order_id, razorpay_payment_id, razorpay_signature);
         

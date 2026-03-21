@@ -6,8 +6,8 @@ import crypto from 'crypto';
 // Generate one-time join token
 export const generateJoinToken = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { webinarId } = req.params;
-        const userId = req.user!.userId;
+        const webinarId = String(req.params.webinarId);
+        const userId = String(req.user!.userId);
 
         const registration = await prisma.registration.findUnique({
             where: { userId_webinarId: { userId, webinarId } }

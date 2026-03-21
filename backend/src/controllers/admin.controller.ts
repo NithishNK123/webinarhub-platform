@@ -18,7 +18,7 @@ export const listUsers = async (req: AuthRequest, res: Response): Promise<void> 
 
 export const banUser = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const id = String(req.params.id);
         const targetUser = await prisma.user.findUnique({ where: { id } });
         if (!targetUser) {
             res.status(404).json({ error: 'User not found' });
@@ -32,7 +32,7 @@ export const banUser = async (req: AuthRequest, res: Response): Promise<void> =>
 
         await prisma.user.update({ where: { id }, data: { isBlocked: true } });
         await logAudit('ADMIN_USER_BANNED', { 
-            userId: req.user!.userId, 
+            userId: String(req.user!.userId), 
             details: { targetUserId: id, targetEmail: targetUser.email } 
         });
 
@@ -45,7 +45,7 @@ export const banUser = async (req: AuthRequest, res: Response): Promise<void> =>
 
 export const unbanUser = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const id = String(req.params.id);
         const targetUser = await prisma.user.findUnique({ where: { id } });
         if (!targetUser) {
             res.status(404).json({ error: 'User not found' });
@@ -54,7 +54,7 @@ export const unbanUser = async (req: AuthRequest, res: Response): Promise<void> 
 
         await prisma.user.update({ where: { id }, data: { isBlocked: false } });
         await logAudit('ADMIN_USER_UNBANNED', { 
-            userId: req.user!.userId, 
+            userId: String(req.user!.userId), 
             details: { targetUserId: id, targetEmail: targetUser.email } 
         });
 
@@ -82,7 +82,7 @@ export const listWebinars = async (req: AuthRequest, res: Response): Promise<voi
 
 export const deleteWebinar = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const id = String(req.params.id);
         const targetWebinar = await prisma.webinar.findUnique({ where: { id } });
         
         if (!targetWebinar) {
@@ -92,7 +92,7 @@ export const deleteWebinar = async (req: AuthRequest, res: Response): Promise<vo
 
         await prisma.webinar.delete({ where: { id } });
         await logAudit('ADMIN_WEBINAR_DELETED', { 
-            userId: req.user!.userId, 
+            userId: String(req.user!.userId), 
             details: { webinarId: id, title: targetWebinar.title, hostId: targetWebinar.hostId } 
         });
 

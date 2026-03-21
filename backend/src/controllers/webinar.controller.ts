@@ -6,7 +6,7 @@ import { AuthRequest } from '../middlewares/authMiddleware';
 export const createWebinar = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { title, description, price, domain, startTime, endTime } = req.body;
-        const hostId = req.user!.userId;
+        const hostId = String(req.user!.userId);
 
         const host = await prisma.user.findUnique({ where: { id: hostId } });
         if (price > 0 && !host?.isVerifiedHost) {
