@@ -69,11 +69,11 @@ npm run test
 ```
 
 ## 🔐 Admin Access
-The automated `db seed` provisions the following Super Admin account:
-- **Email**: `admin@webinarhub.com`
-- **Password**: `admin123`
+For security reasons, default administrative credentials must be configured securely before production deployment. 
 
-Login at `http://localhost:5173` to access the operational dashboard.
+The automated DB seeder (`npx prisma db seed`) will generate an initial Super Admin account. Please review `backend/prisma/seed.ts` to customize the Admin email and securely hash your intended password before launching your environment.
+
+Once initialized, login seamlessly at `http://localhost:5173` (or your routed production URL) to access the operational dashboard.
 
 ---
 *Built with secure, scalable, and modular architectural principles.*
