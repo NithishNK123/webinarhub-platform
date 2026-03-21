@@ -69,7 +69,7 @@ export const listWebinars = async (req: AuthRequest, res: Response): Promise<voi
     try {
         const webinars = await prisma.webinar.findMany({
             select: {
-                id: true, title: true, status: true, 
+                id: true, title: true, domain: true, 
                 host: { select: { id: true, name: true, email: true } }
             }
         });
