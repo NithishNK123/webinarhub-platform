@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://webinarhub-platform.onrender.com/api',
 });
 
 // Request interceptor to attach Bearer token
