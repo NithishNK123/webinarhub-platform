@@ -67,8 +67,8 @@ export const listWebinars = async (req: Request, res: Response): Promise<void> =
 // Register for Webinar (Free only for now - Paid handled in Step 5 Payment)
 export const registerForWebinar = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const webinarId = req.params.id;
-        const userId = req.user!.userId;
+        const webinarId = String(req.params.id);
+        const userId = String(req.user!.userId);
 
         const webinar = await prisma.webinar.findUnique({ where: { id: webinarId } });
         if (!webinar) {
