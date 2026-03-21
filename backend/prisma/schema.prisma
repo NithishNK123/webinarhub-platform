@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  phone         String         @unique
+  passwordHash  String
+  role          String         @default("user")
+  isBlocked     Boolean        @default(false)
+  isVerifiedHost Boolean       @default(false)
+  lastIp        String?
+  deviceId      String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  webinars      Webinar[]      @relation("HostWebinars")
+  registrations Registration[]
+  payments      Payment[]
+  messages      ChatMessage[]
+  reviews       Review[]       @relation("UserReviews")
+}
+
+model Webinar {
+  id            String         @id @default(uuid())
+  title         String
+  description   String
+  price         Float
+  domain        String?        @default("general")
+  averageRating Float          @default(0)
+  ratingCount   Int            @default(0)
+  hostId        String
+  host          User           @relation("HostWebinars", fields: [hostId], references: [id])
+  startTime     DateTime
+  endTime       DateTime
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  registrations Registration[]
+  messages      ChatMessage[]
+  reviews       Review[]       @relation("WebinarReviews")
+}
+
+model Registration {
+  id        String   @id @default(uuid())
+  userId    String
+  webinarId String
+  user      User     @relation(fields: [userId], references: [id])
+  webinar   Webinar  @relation(fields: [webinarId], references: [id])
+  joinToken String?  @unique
+  createdAt DateTime @default(now())
+
+  @@unique([userId, webinarId])
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  razorpayId    String   @unique
+  orderId       String   @unique
+  amount        Float
+  currency      String   @default("INR")
+  status        String   @default("PENDING")
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  webinarId     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  content   String
+  userId    String
+  webinarId String
+  user      User     @relation(fields: [userId], references: [id])
+  webinar   Webinar  @relation(fields: [webinarId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model WebhookEvent {
+  id        String   @id @default(uuid())
+  eventId   String   @unique
+  event     String
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int      // 1 to 5
+  comment   String?
+  userId    String
+  webinarId String
+  user      User     @relation("UserReviews", fields: [userId], references: [id])
+  webinar   Webinar  @relation("WebinarReviews", fields: [webinarId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, webinarId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  // nullable if action occurs before login (e.g. failed login attempt)
+  action    String   // e.g. "LOGIN_FAILED", "PAYMENT_SUCCESS", "WEBINAR_CREATED"
+  ipAddress String?
+  deviceId  String?
+  details   Json?
+  createdAt DateTime @default(now())
+}
+
+

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  webinar-api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DATABASE_URL=postgresql://webinar:securepassword@postgres:5432/webinarhub?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - webinar-net
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: webinar
+      POSTGRES_PASSWORD: securepassword
+      POSTGRES_DB: webinarhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webinar"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webinar-net
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webinar-net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  webinar-net:
+    driver: bridge
