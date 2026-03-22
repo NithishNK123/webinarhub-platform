@@ -137,7 +137,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         
         res.json({
             message: 'Login successful',
-            user: { id: user.id, name: user.name, email: user.email },
+            user: { id: user.id, name: user.name, email: user.email, role: user.role },
             accessToken
         });
 
