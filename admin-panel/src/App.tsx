@@ -14,7 +14,9 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/login', { email, password });
+      const sanitizedEmail = email.trim();
+      const sanitizedPassword = password.trim();
+      const { data } = await api.post('/auth/login', { email: sanitizedEmail, password: sanitizedPassword });
       if (data.user.role !== 'admin') {
         setError('Unauthorized: Admin access required.');
         setLoading(false);
