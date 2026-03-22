@@ -2,7 +2,7 @@ import 'package:dio/dio.dio';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://10.0.2.2:5000/api';
+  static const String baseUrl = 'https://webinarhub-platform.onrender.com/api';
   late Dio dio;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
